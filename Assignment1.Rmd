@@ -1,0 +1,40 @@
+**Reading the data**
+
+```{r}
+monitor <- read.csv("activity.csv", stringsAsFactors = FALSE)
+head(monitor)
+```
+
+**The mean of total number of steps taken per day**
+
+```{r}
+library("dplyr")
+totalSteps <- monitor %>% group_by(date) %>% summarise(total = sum(steps, 
+    na.rm = T)) 
+
+# Define total mean and total median of steps sums for each day
+totalMean <- mean(totalSteps$total)
+print(totalMean)
+
+totalMedian <- median(totalSteps$total)
+print(totalMedian)
+
+library("ggplot2")
+theme_set(theme_gray(base_size = 14))
+ggplot(totalSteps, aes(x = total)) + geom_histogram(fill = "yellow", 
+    colour = "black") + geom_vline(xintercept = totalMean, color = "brown", 
+    linetype = "dashed", size = 1) + geom_vline(xintercept = totalMedian, color = "red", 
+    linetype = "dashed", size = 1) + labs(title = "Number of steps \n taken for each day") + 
+    labs(x = "", y = "")
+```
+
+**5 Minute interval**
+```{r}
+avgSteps <- monitor %>% group_by(interval) %>% summarise(avg.intvl = mean(steps, na.rm = T))
+
+maxInd <- which(avgSteps$avg.intvl == max(avgSteps$avg.intvl))
+maxInterv <- avgSteps[maxInd, 1]
+
+qplot(interval, avg.intvl, data = avgSteps) + geom_line() + geom_vline(xintercept = maxInterv, 
+    color = "red", linetype = "dashed", size = 1) + labs(title = "Time series ") + 
+    labs(x = "5-minute interval signature", y = "number of steps ")
